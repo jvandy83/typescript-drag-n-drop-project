@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -100,27 +113,15 @@ var Component = (function () {
     };
     return Component;
 }());
-var ProjectList = (function () {
+var ProjectList = (function (_super) {
+    __extends(ProjectList, _super);
     function ProjectList(type) {
-        var _this = this;
-        this.type = type;
-        this.templateElement = (document.getElementById('project-list'));
-        this.hostElement = document.getElementById('app');
-        var importedNode = document.importNode(this.templateElement.content, true);
-        this.assignedProjects = [];
-        this.sectionElement = importedNode.firstElementChild;
-        this.sectionElement.id = this.type + "-projects";
-        projectState.addListener(function (projects) {
-            var relevantProjects = projects.filter(function (proj) {
-                return _this.type === 'active'
-                    ? proj.status === ProjectStatus.Active
-                    : proj.status === ProjectStatus.Finished;
-            });
-            _this.assignedProjects = relevantProjects;
-            _this.renderProjects();
-        });
-        this.attach();
-        this.renderContent();
+        var _this = _super.call(this, 'project-list', 'app', false, type + "-projects") || this;
+        _this.type = type;
+        _this.assignedProjects = [];
+        _this.configure();
+        _this.renderContent();
+        return _this;
     }
     ProjectList.prototype.renderProjects = function () {
         var listEl = document.getElementById(this.type + "-projects-list");
@@ -133,17 +134,26 @@ var ProjectList = (function () {
             listEl.appendChild(listItem);
         }
     };
+    ProjectList.prototype.configure = function () {
+        var _this = this;
+        projectState.addListener(function (projects) {
+            var relevantProjects = projects.filter(function (proj) {
+                return _this.type === 'active'
+                    ? proj.status === ProjectStatus.Active
+                    : proj.status === ProjectStatus.Finished;
+            });
+            _this.assignedProjects = relevantProjects;
+            _this.renderProjects();
+        });
+    };
     ProjectList.prototype.renderContent = function () {
         var listId = this.type + "-projects-list";
-        this.sectionElement.querySelector('ul').id = listId;
-        this.sectionElement.querySelector('h2').textContent =
+        this.element.querySelector('ul').id = listId;
+        this.element.querySelector('h2').textContent =
             this.type.toUpperCase() + 'PROJECTS';
     };
-    ProjectList.prototype.attach = function () {
-        this.hostElement.insertAdjacentElement('beforeend', this.sectionElement);
-    };
     return ProjectList;
-}());
+}(Component));
 var ProjectInput = (function () {
     function ProjectInput() {
         this.templateElement = document.getElementById('project-input');
